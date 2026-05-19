@@ -1,0 +1,435 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes esenciales
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{parskip}
+\usepackage{hyperref}
+
+% --- PALETA DE COLORES POR SECCIÓN ---
+\definecolor{colorAritmetica}{HTML}{6C5CE7} % Morado
+\definecolor{colorTransferencia}{HTML}{0984E3} % Azul
+\definecolor{colorLogica}{HTML}{00B894} % Verde Esmeralda
+\definecolor{colorCondicional}{HTML}{D63031} % Rojo/Tomate
+\definecolor{colorIncondicional}{HTML}{E17055} % Naranja
+\definecolor{colorSyscall}{HTML}{FD79A8} % Rosa
+\definecolor{colorCiclos}{HTML}{00CEC9} % Cyan Marino
+\definecolor{codeBG}{HTML}{2D3436} 
+\definecolor{codeText}{HTML}{DFE6E9}
+\definecolor{keywordColor}{HTML}{74B9FF}
+\definecolor{commentColor}{HTML}{55E6C1}
+\definecolor{registerColor}{HTML}{FD79A8}
+\definecolor{numberColor}{HTML}{FDCB6E}
+
+% Configuración de listings
+\lstdefinelanguage{MIPS}{
+  morekeywords={add, addi, sub, subi, and, or, andi, ori, sll, srl, lw, sw, lh, sh, lb, sb, lui, beq, bne, slt, slti, j, jal, jr, li, nor, la, move, bgt, bge, blt, ble, syscall},
+  morecomment=[l]{\#},
+  sensitive=false,
+}
+
+\lstset{
+  language=MIPS,
+  backgroundcolor=\color{codeBG},
+  basicstyle=\ttfamily\color{codeText}\small,
+  keywordstyle=\color{keywordColor}\bfseries,
+  commentstyle=\color{commentColor}\itshape,
+  showstringspaces=false,
+  frame=round,
+  frameround=tttt,
+  rulecolor=\color{codeBG},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  tabsize=4
+}
+
+% Comandos para cajas de colores dinámicos
+\newtcolorbox{instructionBox}[2][]{
+  colback=#2!5,
+  colframe=#2,
+  fonttitle=\bfseries,
+  title=#1,
+  arc=1mm,
+  left=2mm, right=2mm, top=2mm, bottom=2mm
+}
+
+\begin{document}
+
+\begin{center}
+    \vspace*{0.5cm}
+    {\Huge \textbf{\textcolor{colorAritmetica}{HOJA DE REFERENCIA MIPS32}}}\\[0.3cm]
+    {\Large \textit{Arquitectura del Computador.\\ Penélope Robledo.\\ Sección 1.\\}}\\[0.8cm]
+\end{center}
+
+\begin{tcolorbox}[colback=gray!10, colframe=black, title=CONCEPTOS GENERALES, fonttitle=\bfseries\Large]
+
+\textbf{Estructura de un Archivo Ensamblador:}
+Todo programa se divide en dos secciones principales mediante directivas:
+\begin{itemize}
+    \item \textbf{\texttt{.data}}: Aquí se declaran los datos. Físicamente se alojan las variables en RAM, mensajes, cadenas de texto (\texttt{.asciiz}) y arreglos.
+    \item \textbf{\texttt{.text}}: Aquí reside el código. Se escribe la lógica del programa, las instrucciones a ejecutar directamente por el procesador, y la etiqueta de inicio \texttt{main:}.
+\end{itemize}
+
+\textbf{Ejemplo de una Sintaxis Estructural Inicial:}
+\begin{lstlisting}[numbers=none]
+.data
+   numero: .word 25        # Variable entera comun
+   texto:  .asciiz "Hola"  # Cadena de texto (String)
+
+.text
+main:
+   lw $t0, numero          # Inicia el codigo cargando un valor
+\end{lstlisting}
+
+\textbf{Organización de una Línea de Instrucción MIPS:}
+\begin{itemize}
+    \item \textbf{OPCODE / INSTRUCCIÓN}: Especifica la operación a realizar (ej: `add`).
+    \item \textbf{REGISTRO DESTINO}: El registro donde se almacenará el resultado.
+    \item \textbf{OPERANDOS}: Los elementos de origen desde donde saldrá la información.
+\end{itemize}
+
+\textbf{Principales Registros (De un total de 32):}
+\begin{itemize}
+    \item \texttt{\$t0-\$t9}: Registros temporales para almacenar operaciones o contadores de corto plazo.
+    \item \texttt{\$a0-\$a3}: Paso de argumentos requeridos para rutinas y el sistema.
+    \item \texttt{\$v0-\$v1}: Valores retornados por funciones y códigos que solicitan un \texttt{syscall}.
+    \item \texttt{\$ra}: Dirección de retorno requerida al utilizar un salto tipo \texttt{jal}.
+\end{itemize}
+\end{tcolorbox}
+
+
+% --- SECCIÓN A: ARITMÉTICA ---
+\section*{\textcolor{colorAritmetica}{A. Operaciones Aritméticas}}
+
+\begin{instructionBox}[1. ADD (Suma de Registros)]{colorAritmetica}
+\textbf{Instrucción:} Suma los valores contenidos en dos registros de origen y almacena el resultado en un registro destino.
+\begin{lstlisting}
+add $t0, $t1, $t2   # Sumar registros
+\end{lstlisting}
+\textbf{Explicación:} Se toman los valores numéricos almacenados en los registros temporales \texttt{\$t1} y \texttt{\$t2}, se suman, y el resultado final se guarda en el registro \texttt{\$t0}.
+\end{instructionBox}
+
+\begin{instructionBox}[2. ADDI (Suma con Inmediato)]{colorAritmetica}
+\textbf{Instrucción:} Suma el valor de un registro de origen con un valor constante (un número directo escrito en el código) y guarda el resultado en un registro destino.
+\begin{lstlisting}
+addi $s0, $s1, 100  # Sumar constante
+\end{lstlisting}
+\textbf{Explicación:} Se toma el valor contenido en el registro \texttt{\$s1}, se le suma directamente la constante numérica 100, y el resultado se almacena en el registro \texttt{\$s0}.
+\end{instructionBox}
+
+\begin{instructionBox}[3. SUB (Resta de Registros)]{colorAritmetica}
+\textbf{Instrucción:} Resta el contenido del segundo registro de origen al primer registro de origen y guarda la diferencia en un registro destino.
+\begin{lstlisting}
+sub $t0, $t1, $t2   # Restar registros
+\end{lstlisting}
+\textbf{Explicación:} Se realiza la operación matemática de restar el valor del registro \texttt{\$t2} al valor del registro \texttt{\$t1} (\texttt{\$t1} - \texttt{\$t2}). El resultado obtenido se almacena en \texttt{\$t0}.
+\end{instructionBox}
+
+\begin{instructionBox}[4. SUBI (Resta con Inmediato)]{colorAritmetica}
+\textbf{Instrucción:} Resta un valor numérico constante directamente al contenido de un registro de origen y guarda el resultado en un registro destino.
+\begin{lstlisting}
+subi $s0, $s1, 50   # Restar constante numerica
+\end{lstlisting}
+\textbf{Explicación:} Se le resta el número constante 50 al valor actual del registro \texttt{\$s1}, y el resultado final de la resta se guarda en el registro \texttt{\$s0}.
+\end{instructionBox}
+
+% --- SECCIÓN B: TRANSFERENCIA ---
+\section*{\textcolor{colorTransferencia}{B. Transferencia de Datos}}
+
+\begin{instructionBox}[5. LI (Cargar Inmediato)]{colorTransferencia}
+\textbf{Instrucción:} Introduce un número entero constante directamente dentro de un registro.
+\begin{lstlisting}
+li $t0, 50          # Cargar numero directo
+\end{lstlisting}
+\textbf{Explicación:} Se asigna el número entero 50 de forma directa en el registro \texttt{\$t0}, inicializando dicha variable con ese valor.
+\end{instructionBox}
+
+\begin{instructionBox}[6. LA (Load Address)]{colorTransferencia}
+\textbf{Instrucción:} Carga la dirección de memoria de una etiqueta declarada previamente en la sección de datos (\texttt{.data}).
+\begin{lstlisting}
+la $a0, mensaje     # Cargar la direccion del texto
+\end{lstlisting}
+\textbf{Explicación:} Se busca la ubicación en la memoria RAM donde se encuentra el dato llamado \texttt{mensaje} y se guarda esa dirección de memoria dentro del registro \texttt{\$a0}.
+\end{instructionBox}
+
+\begin{instructionBox}[7. MOVE (Copiar)]{colorTransferencia}
+\textbf{Instrucción:} Duplica el valor contenido en un registro de origen y lo coloca en un registro destino.
+\begin{lstlisting}
+move $t0, $t1       # Copiar contenido de $t1 en $t0
+\end{lstlisting}
+\textbf{Explicación:} Se toma el valor que se encuentra dentro del registro \texttt{\$t1} y se copia en el registro \texttt{\$t0}. El valor original de \texttt{\$t1} permanece intacto.
+\end{instructionBox}
+
+\begin{instructionBox}[8. LW (Load Word)]{colorTransferencia}
+\textbf{Instrucción:} Copia un dato de 32 bits (una palabra completa) desde una dirección específica de la memoria RAM hacia un registro.
+\begin{lstlisting}
+lw $t1, 0($s0)      # Traer los bits desde memoria a t1
+\end{lstlisting}
+\textbf{Explicación:} Se accede a la posición de memoria RAM apuntada por el registro \texttt{\$s0} (con un desplazamiento de 0 bytes), se extrae el número de 32 bits allí guardado y se coloca en el registro \texttt{\$t1}.
+\end{instructionBox}
+
+\begin{instructionBox}[9. SW (Store Word)]{colorTransferencia}
+\textbf{Instrucción:} Copia un dato de 32 bits desde un registro hacia una dirección específica de la memoria RAM.
+\begin{lstlisting}
+sw $t1, 4($s0)      # Guardar en memoria (Desplazamiento 4)
+\end{lstlisting}
+\textbf{Explicación:} Se toma el valor numérico de 32 bits que está dentro del registro \texttt{\$t1} y se guarda en la memoria RAM, específicamente en la dirección apuntada por \texttt{\$s0} más un desplazamiento físico de 4 bytes.
+\end{instructionBox}
+
+\begin{instructionBox}[10. LH (Load Halfword)]{colorTransferencia}
+\textbf{Instrucción:} Lee únicamente 16 bits (media palabra) desde la memoria RAM y los transfiere a un registro, extendiendo automáticamente el signo del número para rellenar los 32 bits del registro.
+\begin{lstlisting}
+lh $t2, 0($s0)      # Cargar fraccion de 16 bits
+\end{lstlisting}
+\textbf{Explicación:} Se extrae un fragmento de 16 bits desde la dirección de memoria indicada por \texttt{\$s0} y se almacena en el registro \texttt{\$t2}, respetando si el número es positivo o negativo.
+\end{instructionBox}
+
+\begin{instructionBox}[11. SH (Store Halfword)]{colorTransferencia}
+\textbf{Instrucción:} Guarda los 16 bits inferiores (la mitad menos significativa) de un registro dentro de una posición en la memoria RAM.
+\begin{lstlisting}
+sh $t2, 0($s1)      # Guardar solamente 16 bits
+\end{lstlisting}
+\textbf{Explicación:} Se extraen solo los 16 bits más bajos del registro \texttt{\$t2} y se almacenan en la ubicación de memoria RAM que determina el registro \texttt{\$s1}.
+\end{instructionBox}
+
+\begin{instructionBox}[12. LB (Load Byte)]{colorTransferencia}
+\textbf{Instrucción:} Extrae un único byte (8 bits) desde la memoria RAM y lo coloca en un registro, extendiendo el signo para ocupar los 32 bits.
+\begin{lstlisting}
+lb $t3, 0($s0)      # Cargar un caracter individual
+\end{lstlisting}
+\textbf{Explicación:} Se lee un byte desde la memoria RAM usando la dirección guardada en \texttt{\$s0} y se transfiere al registro \texttt{\$t3}. Esta operación es común al procesar caracteres individuales en formato ASCII.
+\end{instructionBox}
+
+\begin{instructionBox}[13. SB (Store Byte)]{colorTransferencia}
+\textbf{Instrucción:} Almacena únicamente el byte inferior (los 8 bits de menor peso) de un registro en una dirección de la memoria RAM.
+\begin{lstlisting}
+sb $t3, 1($s1)      # Escribir 1 simple byte
+\end{lstlisting}
+\textbf{Explicación:} Se toman los 8 bits finales del registro \texttt{\$t3} y se graban en la memoria RAM, en la dirección de \texttt{\$s1} más un desplazamiento de 1 byte. Es de utilidad para modificar caracteres específicos o variables booleanas.
+\end{instructionBox}
+
+\begin{instructionBox}[14. LUI (Load Upper Immediate)]{colorTransferencia}
+\textbf{Instrucción:} Carga una constante de 16 bits en la mitad superior de un registro, mientras que la mitad inferior se llena automáticamente con ceros.
+\begin{lstlisting}
+lui $t0, 0xABCD     # Cargar en la parte alta (Upper)
+\end{lstlisting}
+\textbf{Explicación:} El valor hexadecimal \texttt{0xABCD} se posiciona en los 16 bits más altos del registro \texttt{\$t0}. El registro queda con la estructura interna \texttt{0xABCD0000}.
+\end{instructionBox}
+
+% --- SECCIÓN C: LÓGICA ---
+\section*{\textcolor{colorLogica}{C. Operaciones Lógicas}}
+
+\begin{instructionBox}[15. AND (Y Lógico)]{colorLogica}
+\textbf{Instrucción:} Realiza una comparación lógica "Y"  bit a bit entre dos registros. El bit resultante será 1 si, y solo si, los dos bits evaluados son 1.
+\begin{lstlisting}
+and $t0, $t1, $t2   # Operacion AND entre registros
+\end{lstlisting}
+\textbf{Explicación:} Se comparan uno a uno los bits de \texttt{\$t1} con los de \texttt{\$t2}. Si ambos bits en la misma posición son 1, el bit correspondiente en \texttt{\$t0} se establece en 1; de lo contrario, se establece en 0.
+\end{instructionBox}
+
+\begin{instructionBox}[16. ANDI (Y Lógico Inmediato)]{colorLogica}
+\textbf{Instrucción:} Realiza la operación lógica "Y"  bit a bit entre el contenido de un registro y un valor constante directo.
+\begin{lstlisting}
+andi $t0, $t1, 0xFF # Operacion AND con un numero directo
+\end{lstlisting}
+\textbf{Explicación:} Se aplica la operación AND entre el registro \texttt{\$t1} y la constante hexadecimal \texttt{0xFF}. El resultado se guarda en \texttt{\$t0}, lo cual permite aislar u ocultar bits específicos mediante un valor conocido.
+\end{instructionBox}
+
+\begin{instructionBox}[17. OR (O Lógico)]{colorLogica}
+\textbf{Instrucción:} Realiza una comparación lógica 'O' bit a bit entre dos registros. El bit resultante será 1 si al menos uno de los dos bits evaluados es 1.
+\begin{lstlisting}
+or $t0, $t1, $t2    # Operacion OR entre registros
+\end{lstlisting}
+\textbf{Explicación:} Se evalúan los bits de \texttt{\$t1} y \texttt{\$t2}. Si en una posición cualquiera alguno de los dos bits es 1 (o ambos), el bit en esa posición del registro \texttt{\$t0} se enciende en 1.
+\end{instructionBox}
+
+\begin{instructionBox}[18. ORI (O Lógico Inmediato)]{colorLogica}
+\textbf{Instrucción:} Realiza una operación lógica 'O' bit a bit entre un registro y un valor constante directo.
+\begin{lstlisting}
+ori $t0, $t1, 0x0F  # Operacion OR con una base constante  
+\end{lstlisting}
+\textbf{Explicación:} Se aplica la operación OR entre el contenido del registro \texttt{\$t1} y la constante \texttt{0x0F}. Esto obliga a que los últimos 4 bits del registro destino \texttt{\$t0} cambien a 1, manteniendo el resto de los bits igual a como estaban en \texttt{\$t1}.
+\end{instructionBox}
+
+\begin{instructionBox}[19. NOR (O Negado)]{colorLogica}
+\textbf{Instrucción:} Realiza la operación lógica combinada 'O' bit a bit entre dos registros y luego invierte el resultado (operación NOT al resultado).
+\begin{lstlisting}
+nor $t0, $t1, $zero # Invierte todos los bits de $t1
+\end{lstlisting}
+\textbf{Explicación:} Al operar el registro \texttt{\$t1} con el registro constante \texttt{\$zero} (que siempre vale 0) mediante un NOR, se logra invertir por completo cada bit de \texttt{\$t1}. El resultado guardado en \texttt{\$t0} es la negación exacta (NOT) de \texttt{\$t1}.
+\end{instructionBox}
+
+\begin{instructionBox}[20. SRL (Shift Right Logical)]{colorLogica}
+\textbf{Instrucción:} Mueve todos los bits de un registro hacia la derecha la cantidad de posiciones indicada por una constante, rellenando los espacios vacíos del lado izquierdo con ceros.
+\begin{lstlisting}
+srl $t0, $t1, 2     # Desplazar 2 posiciones a la derecha
+\end{lstlisting}
+\textbf{Explicación:} Todos los bits contenidos en el registro \texttt{\$t1} se desplazan dos posiciones hacia la derecha y el resultado se guarda en \texttt{\$t0}. Matemáticamente, esta acción equivale a dividir el valor entero de \texttt{\$t1} entre 4 ($2^2$).
+\end{instructionBox}
+
+% --- SECCIÓN D: SALTO CONDICIONAL E INCONDICIONAL ---
+\section*{\textcolor{colorCondicional}{D. Saltos y Condicionales (Comparadores)}}
+
+\begin{instructionBox}[21. BEQ (Igual) / BNE (Diferente)]{colorCondicional}
+\textbf{Instrucción:} Comparan el contenido de dos registros. Si los registros son iguales (\texttt{beq}) o si son diferentes (\texttt{bne}), el programa interrumpe su secuencia normal y salta a una etiqueta especificada.
+\begin{lstlisting}
+beq $t0, $t1, Etiqueta # Si (t0 == t1) saltar a Etiqueta
+bne $t0, $t1, Etiqueta # Si (t0 != t1) saltar a Etiqueta
+\end{lstlisting}
+\textbf{Explicación:} En la primera línea, si el valor de \texttt{\$t0} es idéntico al de \texttt{\$t1}, la ejecución continúa en \texttt{Etiqueta}. En la segunda línea, el salto a \texttt{Etiqueta} ocurre únicamente si los valores de ambos registros son distintos.
+\end{instructionBox}
+
+\begin{instructionBox}[22. BLT y BLE (Menor / Menor o igual)]{colorCondicional}
+\textbf{Instrucción:} Evalúan si un registro es menor (\texttt{blt}) o si es menor o igual (\texttt{ble}) en comparación con un segundo registro. De cumplirse la condición, el flujo salta a la etiqueta indicada.
+\begin{lstlisting}
+blt $t0, $t1, Etiqu # Si (t0 < t1) saltar a Etiqu
+ble $t0, $t1, Etiqu # Si (t0 <= t1) saltar a Etiqu
+\end{lstlisting}
+\textbf{Explicación:} El programa redirige su flujo hacia \texttt{Etiqueta} si el valor numérico almacenado en \texttt{\$t0} resulta ser menor estricto o menor/igual que el valor almacenado en \texttt{\$t1}.
+\end{instructionBox}
+
+\begin{instructionBox}[23. BGT y BGE (Mayor / Mayor o igual)]{colorCondicional}
+\textbf{Instrucción:} Evalúan si un registro es mayor (\texttt{bgt}) o si es mayor o igual (\texttt{bge}) en comparación con un segundo registro. De cumplirse la condición, el flujo salta a la etiqueta indicada.
+\begin{lstlisting}
+bgt $t0, $t1, Etiqu # Si (t0 > t1) saltar a Etiqu
+bge $t0, $t1, Etiqu # Si (t0 >= t1) saltar a Etiqu
+\end{lstlisting}
+\textbf{Explicación:} El programa altera su orden de ejecución saltando a \texttt{Etiqueta} si el valor numérico del registro \texttt{\$t0} es mayor estricto o mayor/igual que el contenido del registro \texttt{\$t1}.
+\end{instructionBox}
+
+\begin{instructionBox}[24. SLT / SLTI (Set Less Than)]{colorCondicional}
+\textbf{Instrucción:} Realiza una comparación entre dos valores. Si el primer registro es menor que el segundo registro (\texttt{slt}) o menor que una constante (\texttt{slti}), asigna un valor de 1 (verdadero) en el registro destino. En caso contrario, asigna un 0 (falso).
+\begin{lstlisting}
+slt $t0, $s1, $s2   # Guarda un 1 si $s1 < $s2
+slti $t0, $s1, 10   # Guarda un 1 si $s1 < 10 (con constante)
+\end{lstlisting}
+\textbf{Explicación:} En la primera línea, el registro \texttt{\$t0} recibirá el valor de 1 si el contenido de \texttt{\$s1} es menor que el de \texttt{\$s2}; de lo contrario recibirá un 0. En la segunda línea ocurre lo mismo, pero comparando \texttt{\$s1} contra la constante numérica 10.
+\end{instructionBox}
+
+\section*{\textcolor{colorIncondicional}{E. Saltos Incondicionales (Directos)}}
+
+\begin{instructionBox}[25. J (Jump)]{colorIncondicional}
+\textbf{Instrucción:} Desvía el flujo del programa de forma directa y obligatoria hacia una etiqueta específica, sin realizar ninguna comparación previa.
+\begin{lstlisting}
+j Fin_bucle          # Salta directamente a la etiqueta Fin_bucle
+\end{lstlisting}
+\textbf{Explicación:} La ejecución del código interrumpe inmediatamente su orden lineal y se transfiere de forma directa a la línea donde se encuentra la etiqueta \texttt{Fin\_bucle}.
+\end{instructionBox}
+
+\begin{instructionBox}[26. JAL (Jump And Link)]{colorIncondicional}
+\textbf{Instrucción:} Realiza un salto incondicional hacia una etiqueta (normalmente una subrutina o función) y, simultáneamente, guarda la dirección de la siguiente instrucción en el registro de retorno (\texttt{\$ra}).
+\begin{lstlisting}
+jal FuncionA         # Llama a la funcion y guarda la direccion de retorno
+\end{lstlisting}
+\textbf{Explicación:} El programa salta a ejecutar el bloque de código denominado \texttt{FuncionA}. Antes de efectuar el salto, el procesador almacena de forma automática la ubicación del punto de origen en el registro \texttt{\$ra}, permitiendo que el programa sepa a dónde regresar después.
+\end{instructionBox}
+
+\begin{instructionBox}[27. JR (Jump Register)]{colorIncondicional}
+\textbf{Instrucción:} Efectúa un salto incondicional redirigiendo el flujo del programa a la dirección de memoria exacta que se encuentra almacenada dentro de un registro específico.
+\begin{lstlisting}
+jr $ra                # Regresar a quien llamo a esta funcion
+\end{lstlisting}
+\textbf{Explicación:} El procesador lee la dirección de memoria guardada en el registro \texttt{\$ra} (colocada previamente por una instrucción \texttt{jal}) y regresa el flujo del programa exactamente a la línea posterior desde donde se invocó la subrutina.
+\end{instructionBox}
+
+% --- SECCIÓN F: LLAMADAS AL SISTEMA ---
+\section*{\textcolor{colorSyscall}{F. Llamadas al Sistema (SYSCALL)}}
+
+\begin{tcolorbox}[colback=colorSyscall!5, colframe=colorSyscall, title=Funciones del Sistema (Input y Consola), fonttitle=\bfseries]
+La instrucción \textbf{\texttt{syscall}} detiene momentáneamente el programa para solicitarle al simulador o al sistema operativo que realice una tarea de entrada o salida. El procesador sabrá exactamente qué acción ejecutar dependiendo del número entero que se haya cargado previamente en el registro \textbf{\texttt{\$v0}}.
+
+La lista principal de acciones que el sistema puede ejecutar es la siguiente:
+\begin{itemize}
+    \item \textbf{\texttt{li \$v0, 1}}: \textbf{Imprimir un Entero.} Muestra en la pantalla de la consola el número entero almacenado en el registro de argumento \texttt{\$a0}.
+    \item \textbf{\texttt{li \$v0, 4}}: \textbf{Imprimir un Texto / String.} Muestra en pantalla la cadena de caracteres cuya dirección de memoria esté almacenada en el registro \texttt{\$a0}.
+    \item \textbf{\texttt{li \$v0, 5}}: \textbf{Leer un Entero.} Detiene el programa y espera a que el usuario ingrese un número por teclado. El valor introducido se almacena automáticamente en el registro \texttt{\$v0}.
+    \item \textbf{\texttt{li \$v0, 8}}: \textbf{Leer un String.} Espera a que el usuario introduzca texto por teclado y lo almacena en un espacio reservado de la memoria RAM.
+    \item \textbf{\texttt{li \$v0, 10}}: \textbf{Finalizar el Programa.} Termina la ejecución del código de forma correcta y segura.
+\end{itemize}
+
+\textbf{Ejemplo General en Programa: Imprimir un Texto} \\
+La metodología en el código sigue siempre el mismo orden: primero se le indica al registro \textbf{\$v0} el código de la acción, luego se preparan los argumentos necesarios en \textbf{\$a0}, y finalmente se llama a \textbf{syscall} para ejecutar:
+
+\begin{lstlisting}[numbers=none]
+.data
+   mensaje1: .asciiz "Demostracion Hola Mundo\n"
+
+.text
+main:
+   # ---- PASO 1: IMPRESION DE TEXTO ----
+   li $v0, 4           # Se carga el codigo 4 (Imprimir String) en $v0
+   la $a0, mensaje1    # Se carga la direccion del texto en $a0
+   syscall             # Se ejecuta la llamada para mostrar el texto en pantalla
+
+   # ---- PASO 2: FINALIZAR PROGRAMA ----
+   li $v0, 10          # Se carga el codigo 10 (Salir del programa) en $v0
+   syscall             # Se ejecuta la llamada para cerrar el simulador MIPS
+\end{lstlisting}
+\end{tcolorbox}
+
+% --- SECCIÓN G: CICLOS DE REPETICIÓN ---
+\section*{\textcolor{colorCiclos}{G. Lógica Básica de Ciclos (FOR y WHILE)}}
+Para que sea más fácil de entender, la forma en que MIPS construye sus ciclos iterativos se puede comparar directamente con la sintaxis clásica de lenguajes como \texttt{C/C++}.
+
+\begin{tcolorbox}[colback=colorCiclos!5, colframe=colorCiclos, title=Ciclo Básico WHILE, fonttitle=\bfseries]
+En MIPS32, la estructura de un bucle se construye utilizando una \textbf{condición de salida inversa} a la planteada en lenguajes de alto nivel. Si la condición inversa se cumple, el programa realiza un salto condicional para escapar de las iteraciones. Al final del bloque interno del ciclo, se añade un salto incondicional (\texttt{j}) para regresar al inicio y volver a evaluar.
+
+\textbf{Interpretación equivalente (Sintaxis C):}
+\begin{lstlisting}[language=C, numbers=none, commentstyle=\color{gray}\itshape]
+int i = 0;
+while (i < 10) {       // La logica es repetir mientras se cumpla (i < 10)
+    // Bloque de instrucciones internas
+    i++;
+}
+\end{lstlisting}
+
+\textbf{Equivalencia construida sobre simulador MIPS32:}
+\begin{lstlisting}[numbers=none]
+    li $t0, 0                # Se inicializa el contador i = 0
+
+Ciclo_While:
+    bge $t0, 10, Fin_While  # Condicion inversa: si i >= 10, salta fuera del ciclo
+    
+    # ... Bloque de instrucciones MIPS a repetir ...
+    
+    addi $t0, $t0, 1        # Incremento del contador (i++)
+    j Ciclo_While           # Salto incondicional para repetir la comprobacion
+Fin_While:
+    # Continuacion logica del programa fuera del ciclo
+\end{lstlisting}
+\end{tcolorbox}
+
+\vspace{0.3cm}
+\begin{tcolorbox}[colback=colorCiclos!5, colframe=colorCiclos, title=Ciclo Básico FOR, fonttitle=\bfseries]
+Para la construcción de un ciclo \texttt{for} se requiere definir explícitamente un registro que sirva como índice (inicializador) y otro registro que actúe como el valor límite o tope. En este formato común, se utiliza la instrucción \texttt{beq} para comprobar si el índice ha alcanzado exactamente el valor límite, provocando la salida del bucle cuando la condición se cumple.
+
+\textbf{Interpretación equivalente (Sintaxis C):}
+\begin{lstlisting}[language=C, numbers=none, commentstyle=\color{gray}\itshape]
+for (int i = 0; i != 5; i++) {
+    // Bloque de instrucciones a repetir
+}
+\end{lstlisting}
+
+\textbf{Equivalencia construida sobre simulador MIPS32:}
+\begin{lstlisting}[numbers=none]
+    li $t0, 0                # Se define el registro de control i = 0
+    li $t1, 5                # Se define el valor limite o tope = 5 
+
+Ciclo_For:
+    beq $t0, $t1, Fin_For   # Si el indice es igual al tope (i == 5), termina el ciclo
+    
+    # ... Instrucciones y funciones a repetir ...
+    
+    addi $t0, $t0, 1        # Incremento del paso del ciclo (i++)
+    j Ciclo_For             # Salto incondicional para volver a evaluar el ciclo
+Fin_For:
+    # Continuacion del programa tras finalizar el bucle FOR
+\end{lstlisting}
+\end{tcolorbox}
+
+\end{document}
