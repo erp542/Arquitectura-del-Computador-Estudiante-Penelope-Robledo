@@ -1,0 +1,108 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+% --- CONFIGURACIÓN DE DISEÑO ---
+\usepackage{mathpazo}
+\usepackage{tcolorbox}
+\tcbset{
+    cajaformal/.style={
+        colback=blue!10!white,
+        colframe=blue!40!black,
+        arc=2mm,
+        boxrule=0.8pt,
+        top=2mm, bottom=2mm, left=3mm, right=3mm,
+        valign=center,
+        halign=center
+    }
+}
+\usepackage[none]{hyphenat}
+\sloppy
+\emergencystretch=3em
+% --- FIN DE CONFIGURACIÓN ---
+
+\title{\textbf{Formulario de Prestaciones de Computadores}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. Relación básica entre Prestaciones y Tiempo}
+\begin{tcolorbox}[cajaformal]
+\[ \text{Prestaciones} = \frac{1}{\text{Tiempo de ejecución}} \]
+\end{tcolorbox}
+\begin{itemize}
+    \item \textbf{¿Para qué sirve?:} Sirve para establecer la base de la medición. Como las prestaciones son el inverso del tiempo, mejorar las prestaciones requiere obligatoriamente reducir el tiempo de ejecución.
+    \item \textbf{¿Cómo se usa?:} Se utiliza cuando se conoce el tiempo que tarda una tarea en completarse. A mayor tiempo de ejecución, menores serán las prestaciones.
+\end{itemize}
+
+\section*{2. Prestaciones relativas (Comparación entre máquinas)}
+\begin{tcolorbox}[cajaformal]
+\[ \frac{\text{Prestaciones}_X}{\text{Prestaciones}_Y} = \frac{\text{Tiempo de ejecución}_Y}{\text{Tiempo de ejecución}_X} = n \]
+\end{tcolorbox}
+\begin{itemize}
+    \item \textbf{¿Para qué sirve?:} Sirve para determinar cuantitativamente cuántas veces es más rápida una máquina $X$ frente a una máquina $Y$.
+    \item \textbf{¿Cómo se usa?:} El resultado $n$ indica el factor de velocidad. Si $n = 1.5$, la máquina $X$ es 1.5 veces más rápida que la máquina $Y$. Si el resultado es menor a 1, la máquina $X$ es más lenta.
+\end{itemize}
+
+\section*{3. Tiempo de ejecución de CPU}
+\begin{tcolorbox}[cajaformal]
+\[ \text{Tiempo CPU} = \text{Ciclos de reloj} \times \text{Tiempo de ciclo} \]
+\end{tcolorbox}
+\begin{itemize}
+    \item \textbf{¿Para qué sirve?:} Sirve para calcular el tiempo real que la CPU dedica a computar una tarea específica, ignorando tiempos de E/S o la ejecución de otros programas.
+    \item \textbf{¿Cómo se usa?:} Se multiplica el número total de ciclos que requiere el programa por la duración (en segundos) de cada ciclo de reloj.
+\end{itemize}
+
+\section*{4. Tiempo de CPU basado en Frecuencia}
+\begin{tcolorbox}[cajaformal]
+\[ \text{Tiempo CPU} = \frac{\text{Ciclos de reloj}}{\text{Frecuencia de reloj}} \]
+\end{tcolorbox}
+\begin{itemize}
+    \item \textbf{¿Para qué sirve?:} Es la variante técnica de la fórmula anterior, utilizada cuando el valor conocido es la frecuencia (velocidad del procesador en GHz o MHz).
+    \item \textbf{¿Cómo se usa?:} Se divide el número de ciclos requeridos entre la frecuencia del reloj.
+\end{itemize}
+
+\section*{5. Cálculo de Ciclos de Reloj}
+\begin{tcolorbox}[cajaformal]
+\[ \text{Ciclos de reloj} = \text{Número de instrucciones} \times \text{Media de ciclos por instrucción} \]
+\end{tcolorbox}
+\begin{itemize}
+    \item \textbf{¿Para qué sirve?:} Sirve para conocer cuántos ciclos de reloj totales consumirá un programa dado.
+    \item \textbf{¿Cómo se usa?:} Se multiplica el total de instrucciones que tiene el programa por la media de ciclos por instrucción, que representa el promedio de ciclos que necesita cada instrucción para ejecutarse.
+\end{itemize}
+
+\section*{6. Cálculo de la media de ciclos por instrucción}
+\begin{tcolorbox}[cajaformal]
+\[ \text{Media de ciclos por instrucción} = \frac{\text{Ciclos de reloj}}{\text{Número de instrucciones}} \]
+\end{tcolorbox}
+\begin{itemize}
+    \item \textbf{¿Para qué sirve?:} Sirve para evaluar la eficiencia de una arquitectura o de una secuencia de código específica.
+    \item \textbf{¿Cómo se usa?:} Si se conoce el total de ciclos gastados y el total de instrucciones ejecutadas, el resultado de esta división indica qué tan eficiente es la máquina procesando dichas instrucciones.
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+\section*{Nota sobre la Ecuación Maestra}
+Para una visión completa, es importante recordar que el tiempo de ejecución se puede definir mediante la ecuación clásica de las prestaciones del CPU:
+
+\begin{tcolorbox}[cajaformal]
+\[ \text{Tiempo de ejecución} = \text{Num. instrucciones} \times \text{Media ciclos por inst.} \times \text{Tiempo ciclo} \]
+\end{tcolorbox}
+
+Alternativamente, cuando se trabaja con la frecuencia de reloj del procesador, la ecuación se expresa de la siguiente forma:
+
+\begin{tcolorbox}[cajaformal]
+\[ \text{Tiempo de ejecución} = \frac{\text{Num. instrucciones} \times \text{Media ciclos por inst.}}{\text{Frecuencia de reloj}} \]
+\end{tcolorbox}
+
+Esta fórmula es fundamental porque resume cómo afectan al rendimiento tres elementos distintos: el \textbf{compilador} (que influye en el número de instrucciones), la \textbf{arquitectura} (que influye en la media de ciclos por instrucción) y el \textbf{hardware} (que influye en el tiempo de ciclo o frecuencia).
+
+\end{document}
