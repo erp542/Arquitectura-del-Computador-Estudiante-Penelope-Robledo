@@ -1,0 +1,313 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+\geometry{letterpaper, top=3cm, bottom=3cm, left=3cm, right=3cm}
+
+\begin{document}
+
+\begin{center}
+\textbf{UNIVERSIDAD DE CARABOBO.}\\
+\textbf{FACULTAD EXPERIMENTAL DE CIENCIAS Y TECNOLOGÍA.}\\
+\textbf{DEPARTAMENTO DE COMPUTACIÓN.}\\
+\textbf{ARQUITECTURA DEL COMPUTADOR.}
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\INFORME EXPLICATIVO SOBRE EL PROYECTO: RELOJ DIGITAL DE 24 HORAS CON ALARMA.}
+\end{center}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+\textbf{\\}
+
+\vspace{1cm}
+
+\begin{flushright}
+\\\\\\\\\\Integrantes:\\
+Nathalia Noguera.\\
+C.I:32756046.\\
+Penelope Robledo.\\
+\textbf{C.I:32482938.}
+\end{flushright}
+
+\pagebreak
+
+\textbf{INTRODUCCIÓN.}
+
+\indent En este informe, se presenta el diseño, construcción y análisis de un reloj digital de 24 horas con alarma, implementado mediante componentes integrados de las familias TTL y CMOS.
+
+\indent El sistema utiliza un oscilador NE555 como base de tiempo, contadores 74LS90 en cascada para el conteo de segundos, minutos y horas, decodificadores HEF4543/CD4543 para la visualización en displays de 7 segmentos, comparadores 74LS85 y un latch SR para la gestión de la alarma programable mediante switches DIP. 
+
+\indent A lo largo del documento se detalla el funcionamiento paso a paso del circuito, se describen las características y el rol específico de cada componente, se explican las bases teóricas que sustentan su operación, se analizan posibles errores de diseño o montaje y se proponen mejoras para optimizar su rendimiento. 
+
+\indent Finalmente, se presentan las conclusiones obtenidas del proyecto, permitiendo comprender tanto los principios de la electrónica digital como la aplicación práctica de estos conceptos en un dispositivo útil y funcional.
+
+\pagebreak
+
+\textbf{BASES TEÓRICAS Y CONCEPTOS.}
+
+\indent Los relojes, con el paso del tiempo, siguen siendo vitales para cualquier organización o en los aspectos más cotidianos como planear las actividades diarias. Su trayectoria evolutiva es curiosa, avanzando desde masivas estructuras que aprovechaban los rayos del sol, hasta pequeñas pantallas con dígitos numéricos que caben sin problemas en la palma de la mano. Entre este avance evolutivo, los relojes fueron divididos en varias categorías dependiendo del contexto de su uso, por mencionar algunos están los de pared, escritorio, o, indagando en modelos más recientes, portátiles. Aunque habrá un énfasis en el momento en que sucede el salto evolutivo de lo mecánico a lo eléctrico, específicamente rondando los años 1970, pues a partir de allí Hamilton publica el primer reloj digital de pulsera, aplicando los circuitos integrados recién inventados entre dichos años. Su popularidad creció exponencialmente al acercarse los años, la tecnología con diodos led era lo suficiente versátil para expandir el catálogo de relojes.
+
+\indent En esta ocasión, fue seleccionado los relojes de pared para este proyecto, con este se busca lograr hacer entender sus comportamientos internos con éxito, y que componentes o procesos hacen posible que sea un reloj en sí, en cierta forma recopilando todos los conocimientos tanto teóricos como prácticos para dar un elemento conclusivo a todo el aprendizaje obtenido. Más que todo se seleccionó este modelo por lo práctico y accesible que es para una mejor comprensión de sus sistemas internos para un público más diverso.
+
+\indent Ahora estos tipos de reloj, aunque tengan una lógica programable que puede ser implementada en microprocesadores, existen alternativas más económicas, en el proyecto actual, hacer uso de la lógica secuencial, antes de explicar este mismo es necesario ofrecer la base que permitió llegar a dicha alternativa. Además del ahorro de recursos monetarios, es una oportunidad ideal para entender visualmente los procesos internos de un reloj de esta clase, al mismo tiempo se puede interpretar como un claro homenaje a la pasada trayectoria de estos artefactos al pasar los años, la mecánica implementada con engranajes para variar la velocidad de las agujas de los relojes más significativos del siglo pasado, pues ahora gracias al surgimiento de la electrónica digital, este mismo planteamiento fue la base para impulsar la creación de los relojes digitales más icónicos , por supuesto, este periodo de transición, fue una etapa más que significativa. Culminado este aspecto, sin mayores agregados, serán ofrecidos todos los elementos y conceptos que estructuran la lógica secuencial para hacer este proyecto una realidad.
+
+\begin{itemize}
+    \item \textbf{Lógica secuencial:}
+\end{itemize}
+
+Primero es vital entender su relación con la lógica combinacional la cual es el conjunto de operaciones y expresiones existentes en el álgebra de Boole, al introducir el elemento de la memoria en sí, aparece la lógica secuencial, pues permite que las combinaciones sean hechas en patrones recurrentes.
+
+Básicamente se guía del diseño de la lógica combinacional conocido como Mapa de Karnaugh, estas secuencias se presentan en el hecho de aprovechar la cantidad de posibles salidas y, por ende, de combinaciones para hallar patrones. Se puede decir que es un tipo de lógica en informática donde las salidas dependen tanto de los valores de entrada actuales como de los anteriores, lo que permite que el sistema tenga memoria al almacenar información pasada en variables de estado.
+
+\begin{itemize}
+    \item \textbf{Familia lógica TTL (Transistor-Transistor Logic):}
+\end{itemize}
+
+La familia TTL es una de las tecnologías más utilizadas en electrónica digital educativa y profesional caracterizada por utilizar transistores bipolares en su estructura interna, lo que le permite ofrecer alta velocidad de conmutación y buena capacidad de manejo de corriente en las salidas. La subfamilia 74LS (Low-power Schottky) reduce el consumo de potencia respecto a la TTL estándar, manteniendo un voltaje de alimentación típico de 5 V. Sus salidas pueden ser de tipo totem-pole o colector abierto, y son compatibles con niveles lógicos TTL (0 V a 0,8 V para nivel bajo y 2 V a 5 V para nivel alto).
+
+\begin{itemize}
+    \item \textbf{Familia lógica CMOS (Complementary Metal-Oxide-Semiconductor):}
+\end{itemize}
+
+\indent La familia CMOS utiliza transistores de efecto de campo (MOSFET) complementarios (n-canal y p-canal) en cada puerta lógica, teniendo como principal ventaja que es de muy bajo consumo de energía, especialmente cuando no está conmutando, y su amplio rango de voltaje de operación (generalmente de 3 V a 18 V). Los circuitos CMOS son altamente inmunes al ruido y presentan una excelente compatibilidad con niveles lógicos TTL cuando se alimentan a 5 V, un ejemplo de componente utilizado en este proyecto fue el decodificador HEF4543/CD4543.
+
+\begin{itemize}
+    \item \textbf{Generación de señal de reloj}
+\end{itemize}
+
+\indent Toda operación secuencial en un circuito digital requiere una señal periódica denominada “reloj” (clock). Esta señal se genera mediante un oscilador astable que produce pulsos regulares de frecuencia conocida. En el caso de un reloj digital, se ajusta la frecuencia a exactamente 1 Hz (un pulso por segundo), convirtiendo cada pulso en un segundo del tiempo real. La estabilidad de esta señal determina la precisión global del sistema.
+
+\begin{itemize}
+    \item \textbf{Código BCD y conteo decimal}
+\end{itemize}
+
+\indent El código Binary Coded Decimal (BCD) representa cada dígito decimal (0-9) con exactamente 4 bits binarios. Un contador BCD avanza de 0000 a 1001 y, al llegar al valor 1010 (10 en decimal), genera automáticamente una señal de acarreo que reinicia la cuenta y avanza la siguiente etapa. Este mecanismo es fundamental para que el conteo de segundos, minutos y horas siga el sistema decimal natural del tiempo (00-59 y 00-23).
+
+\pagebreak
+
+\begin{itemize}
+    \item \textbf{Componentes utilizados:}
+\end{itemize}
+
+\textbf{D5621A/D5621B:} Conjunto de LEDS con ánodos o cátodos conectados a un mismo Gnd/Vcc dependiendo del modelo, dividido en 7 segmentos enumerados alfabéticamente de a-g.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/image2.png}
+\end{figure}
+
+\textbf{HEF4543 / CD4543E:} En el diseño del reloj digital se emplean dos circuitos integrados HEF4543 (equivalentes funcionales al CD4543), pertenecientes a la familia CMOS. Este componente es un decodificador/driver BCD a 7 segmentos con latch incorporado, diseñado para convertir la información binaria decimal (BCD) de 4 bits proveniente de los contadores en las señales necesarias para activar directamente los displays de 7 segmentos.
+
+\indent El HEF4543/CD4543 es versátil debido al pin PHASE (PH), que permite configurar el comportamiento de las salidas para adaptarse a displays LED de cátodo común o de ánodo común sin necesidad de componentes adicionales.
+
+\begin{itemize}
+    \item Con displays de cátodo común (Common Cathode): Se conecta el pin PHASE a nivel lógico bajo (0, es decir, a GND). En este modo, las salidas del decodificador son activas en alto (nivel lógico 1).
+\end{itemize}
+
+Cuando un segmento debe encenderse, la salida correspondiente del HEF4543 entrega un 1 (aproximadamente VCC). Como el cátodo del display está conectado a GND, el led del segmento se polariza directamente y enciende. De esta forma, el número decodificado se forma correctamente en el display.
+
+\begin{itemize}
+    \item Con displays de ánodo común (Common Anode): Se conecta el pin PHASE a nivel lógico alto (1, es decir, a VCC). En este modo, las salidas del decodificador se invierten y se vuelven activas en bajo (nivel lógico 0).
+\end{itemize}
+
+Cuando un segmento debe encenderse, la salida correspondiente entrega un 0 (aproximadamente GND). Como el ánodo del display está conectado permanentemente a VCC, la corriente fluye desde VCC a través del led hacia la salida del traductor, encendiendo el segmento. El comportamiento de las salidas se invierte respecto al modo anterior, pero el número decodificado se visualiza correctamente.
+
+\indent Esta configuración del pin PHASE invierte la polaridad lógica de las siete salidas (Qa a Qg) según sea necesario, permitiendo que el mismo componente funcione con cualquiera de los dos tipos de display más comunes. En el reloj digital, cada HEF4543/CD4543 recibe la información BCD de los contadores de minutos y horas, y genera directamente las señales para encender los segmentos correspondientes\textbf{.}
+
+\textbf{74LS90:} Funcionalmente es un contador decádico (de décadas) formado por tres biestables JK, y uno SR. La salida Q de cada biestable (flip-flop) representa un bit del número en código BCD, que muestra el estado de conteo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{images/image10.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/image8.png}
+\end{figure}
+
+\indent Un contador electrónico es un circuito secuencial hecho a partir de biestables y puertas lógicas capaz de contar y almacenar los pulsos de entrada. Con un número “n” de biestables el contador puede contar hasta 2n, con 4 puede hacerlo hasta 16, para construir uno que cuente hasta 9 (10 estados porque cuenta el cero), se adicionan compuertas lógicas a los 4 flip-flops. La cantidad de estados se denomina módulo de conteo, por lo que un contador decádico es módulo 10 y a la salida de su último biestable existe un pulso cada 10 de entrada haciéndolo un divisor por 10. Este para avanzar secuencialmente, se necesitan pulsos de reloj, o en su defecto recibir otra señal de “pulso” de otro contador, como se introdujo anteriormente.
+
+\textbf{74LS279:} Es un 4 S -R Flip-flop latch básico. Bajo operación convencional, las entradas S -R normalmente se mantienen altas. Cuando la entrada S está pulsada baja, la salida Q será alta. Cuando R tiene un pulso bajo, la salida Q se reiniciará a un nivel bajo. Normalmente, las entradas S -R no deben tomarse bajas simultáneamente. La salida Q será impredecible en esta condición. El Flip-Flop SR Latch está compuesto por dos puertas NAND con retroalimentación, que se conectan para formar un circuito de realimentación. La entrada SET (S) activa el estado SET, que establece la salida Q en un nivel alto (1). Por otro lado, la entrada RESET (R) activa el estado RESET, que establece la salida Q en un nivel bajo (0). Este componente permite activar la alarma por un periodo extendido de tiempo gracias a la dicha implementación de memoria, se realiza un enfoque en la entrada S para controlar la activación o desactivación de esta misma.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/image9.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/image6.png}
+\end{figure}
+
+\textbf{74LS08:} Este circuito integrado posee cuatro AND quiénes reciben dos entradas cada una, y si ambas están en un valor alto (Es decir, 1) la salida siempre será 1, si esta condición exacta no es cumplida su salida siempre será baja, quiere decir 0.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/image3.png}
+\end{figure}
+
+\textbf{74LS04:} Este circuito integrado permite invertir una entrada que reciba, quiere decir que, si obtiene un valor alto, ahora su salida será en bajo y viceversa. En este se contienen 4 NOT.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/image5.png}
+\end{figure}
+
+\textbf{NE555:} Este peculiar componente puede emplearse para distintas tareas, en este caso se utiliza es su modo astable, quien, en conjunto de resistencias y capacitores de determinado valor, podemos generar la frecuencia que dura exactamente un segundo (1 Hz). Su estructura interna es más compleja, pero en si es capaz de generar pulsos gracias al proceso de carga y descarga producido internamente por un transistor, quien entra en modo bloqueo y pase constantemente dada la corriente vcc la cual es controlada por las resistencias externas para definir la extensión de la tensión de subida y bajada.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/image4.png}
+\end{figure}
+
+\indent Aunque como podrá ser visualizado en posteriores secciones, hay otros componentes que no necesitan mayor explicación porque cumplen una acción en específico, su mismo nombre da el contexto necesario, dichos componentes menores \textbf{son bombillos LEDS, resistencias, capacitores, DIP switches y buzzers.}
+
+\indent Ya dados todos los elementos físicos y teóricos más importantes y por ende necesarios para sustentar la creación de este particular proyecto, puede darse una breve redacción de la construcción de este mismo con la utilización de todos estos componentes previamente destacados.        
+
+\pagebreak
+
+\textbf{CONSTRUCCIÓN DEL RELOJ DIGITAL.}
+
+\indent Dicha construcción se sustenta de la teoría planteada en la sección anterior, específicamente donde se describe la explicación de lo que hace que funcione el reloj en sí, en esa sección se muestra un esquema generado en el simulador Proteus, haciendo este el sustento visual para la estructuración y posicionamiento de cada componente.
+
+\indent Aquí fueron empleados en total los siguientes componentes dentro de 6 protoboards de tamaño estándar:
+
+\begin{itemize}
+    \item 10 Decodificadores BCD a 7 segmentos: HEF4543 / CD4543.
+    \item 6 Contadores 74LS90.
+    \item 1 AND 74LS08.
+    \item 4 Comparadores 74LS85.
+    \item 1 Flip-Flop RS 74LS279.
+    \item 1 Transistor 2N222.
+    \item 1 Generador de pulsos NE555.
+    \item 3 Displays dobles D5621A (Ánodo común).
+    \item 2 Displays dobles D5621B (Cátodo común).
+    \item 1 Buzzer.
+    \item 7 Luces LED.
+    \item 1 NOT 74LS04.
+    \item 47 (aproximado) Resistencias de 220 Ohmios.
+    \item 2 Resistencias de 4.7k ohmios.
+    \item 1 Resistencia de 1k ohmios.
+    \item 4 DIP switches de 4 posiciones.
+    \item 1 Capacitor electrolítico de 100uf.
+    \item 1 Capacitor cerámico de 10nf.
+\end{itemize}
+
+\pagebreak
+
+\textbf{DIAGRAMA (SIMULACIÓN EN PROTEUS) DEL RELOJ DIGITAL.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/image7.jpg}
+\end{figure}
+
+\pagebreak
+
+\textbf{MONTAJE DEL CIRCUITO.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/image1.jpg}
+\end{figure}
+
+\pagebreak
+
+\textbf{Funcionamiento del circuito del reloj digital con alarma.}
+
+\indent Este reloj opera mediante una cadena de etapas interconectadas que generan la base de tiempo, realizan el conteo de segundos, minutos y horas, muestran la información en displays de 7 segmentos y activan una alarma programable cuando la hora real coincide con la hora establecida. A continuación se explican las partes que producen este dispositivo indicando también el nombre de cada componente dado para facilitar el entendimiento al visualizar la imagen en el simulador Proteus.
+
+\indent La señal base de tiempo se genera con el circuito integrado NE555 (U4) configurado en modo astable. Los resistores R1 y R2 (4,7 k$\Omega$) junto con los capacitores C1 (100 $\mu$F) y C2 (10 $\mu$F) determinan la frecuencia, de manera que la salida del pin 3 del NE555 entrega un pulso estable de 1 Hz (un segundo exacto) que se aplica directamente a la entrada de reloj del primer contador de segundos.
+
+\indent Esta señal de 1 Hz alimenta la sección de contadores, que están formados por integrados 74LS90 conectados en cascada, el contador de segundos utiliza los componentes U2 (unidades) y U1 (decenas). Cuando el conteo alcanza 60, la salida de acarreo (pin de carry del 74LS90) se conecta a las entradas 1 y 2 de la compuerta AND 74HC08 (U3:A); la salida de esta compuerta (pin 3) genera el pulso de avance que llega al reloj del contador de minutos. 
+
+\indent De la misma forma, el contador de minutos (U8 para unidades y U7 para decenas) avanza de 00 a 59 y, al llegar a 60, su señal de acarreo pasa por otra compuerta AND para impulsar el contador de horas (U13 para unidades y U12 para decenas), que opera en formato 24 horas.
+
+\indent Las salidas BCD de cada contador (4 bits por dígito) se envían a los decodificadores HEF4543/CD454, haciendo que cada decodificador reciba el código BCD en sus entradas correspondientes y lo convierta en las señales de 7 segmentos necesarias para activar los displays. Para adaptarse a los displays de ánodo común utilizados en el circuito, el pin PHASE (pin 6) de todos los HEF4543 se conecta a VCC (nivel lógico 1), permitiendo que las salidas del decodificador se comporten como activas en bajo, y agregando las resistencias en serie entre cada HEF4543 y su display para limitar la corriente de los LEDs. Es por ello que se visualizan seis dígitos: dos para segundos, dos para minutos y dos para horas.
+
+\indent La sección de alarma se encarga de comparar en tiempo real la hora actual con la hora programada por el usuario, está compuesto inicialmente por cuatro switches de 4 posiciones (SW1 y SW2 para las horas, SW3 y SW4 para los minutos) generan el tiempo deseado para la alarma. Estos códigos se comparan continuamente con las salidas BCD de los contadores mediante cuatro comparadores de magnitud 74LS85 (U17 y U18 para horas, U19 y U20 para minutos). 
+
+\indent Cuando las horas coinciden, la salida de igualdad (A = B) del comparador correspondiente se activa en alto; lo mismo ocurre con los minutos, ambas salidas de igualdad se conectan a las entradas de las compuertas AND 74HC08 (U14:A para horas y U9:A para minutos). Esta salida combinada de estas compuertas AND genera una señal de coincidencia en alto solo cuando tanto la hora como los minutos coinciden exactamente con los valores programados.  
+
+\indent Así, esa señal de coincidencia se aplica directamente a la entrada SET del latch SR 74LS279 (U21) debido a que el latch mantiene el estado de alarma activado aunque el reloj continúe avanzando. Después La salida Q del latch (pin 1) cumple dos funciones; enciende el led D1 a través de la resistencia R63, y activa la bocina (BUZZER) mediante el transistor 2N2222 (Q1). La resistencia R61 (1 k$\Omega$) polariza la base del transistor, que actúa como interruptor de potencia para suministrar la corriente necesaria a la bocina sin sobrecargar la salida del latch. 
+
+\indent Para desactivar la alarma, se pulsa el botón de reset conectado a través de la resistencia R62 y el inversor 74LS04 (U22:A, esta señal llega a la entrada RESET del latch 74LS279, forzando la salida Q a nivel bajo y apagando tanto el LED como la bocina. 
+
+\indent En conclusión, el circuito completa un reloj digital preciso, con visualización en 7 segmentos y una alarma programable que se mantiene activa hasta que el usuario la desactiva manualmente, gracias a un diseño que se basa en lógica TTL y CMOS estándar, garantizando un funcionamiento estable y fiable.  
+
+\pagebreak
+
+\textbf{POSIBLES ERRORES Y PROPUESTAS DE MEJORAS.}
+
+\indent Basado en el diseño y los componentes descritos en el informe, se identifican varias limitaciones y áreas de optimización en el reloj digital con alarma, aunque la arquitectura actual basada en lógica secuencial TTL/CMOS resulta excelente para fines didácticos y de comprensión de los principios básicos, presenta oportunidades claras de mejora en cuanto a precisión, eficiencia energética, robustez y usabilidad.  
+
+\indent Seguidamente se detallan las principales limitaciones detectadas junto con propuestas concretas de mejora:
+
+\textbf{Estabilización de la base de tiempo:}
+
+\indent El oscilador NE555 en modo astable genera la señal de 1 Hz necesaria para el conteo. Sin embargo, este componente es sensible a las variaciones de temperatura y a las tolerancias de los resistores y capacitores externos, lo que provoca que el reloj se adelante o atrase progresivamente con el paso del tiempo.
+
+\indent Es por ello que se propone reemplazar el NE555 por un oscilador de cristal de cuarzo (por ejemplo, de 32.768 kHz) combinado con divisores de frecuencia (como el 74HC4060 o CD4020), debido a que estos nuevos componentes proporcionan una precisión comparable a la de los relojes comerciales modernos y elimina casi por completo el error acumulado.
+
+\textbf{Ausencia de sistema de respaldo ante fallos de alimentación:}
+
+\indent Los contadores 74LS90 y el resto de la lógica secuencial son volátiles, por lo que cualquier interrupción en la fuente de alimentación reinicia completamente el conteo y la configuración de la alarma.
+
+\indent Por lo tanto, una mejora importante sería incorporar un circuito de conmutación automática con una batería de 9 V o una pila de botón CR2032. De esta forma se mantiene la alimentación mínima a los contadores y al latch de alarma, preservando la hora y la programación incluso durante cortes de energía.
+
+\textbf{Consumo energético elevado:}
+
+\indent El circuito utiliza seis decodificadores HEF4543/CD4543 y seis displays de 7 segmentos encendidos de forma continua, esto genera un consumo de corriente considerable, especialmente en un dispositivo diseñado para operar 24 horas al día.
+
+\indent Una solución para este problema sería implementar multiplexación de displays, ya que con un solo decodificador y transistores de conmutación se pueden activar los seis displays de manera secuencial a una frecuencia alta (por encima de 100 Hz), de modo que el ojo humano no perciba parpadeo, esta técnica reduce drásticamente el número de componentes y el consumo total.
+
+\textbf{Limitaciones en la interfaz de usuario:}
+
+\indent La programación de la alarma se realiza exclusivamente mediante switches DIP, y el ajuste de la hora actual depende únicamente del avance natural de los pulsos del oscilador, no existe un método rápido y sencillo para que el usuario configure la hora o la alarma sin esperar.
+
+\indent Aunque no es un impedimento para el uso del reloj, este inconveniente podría disminuir al incluir pulsadores (“Set Time” y “Set Alarm”) que permitan avanzar manualmente los contadores de horas y minutos.  
+
+\indent Incorporar una función “Snooze” mediante un segundo flip-flop o un temporizador (por ejemplo, basado en un 555 o 74HC123) conectado al latch 74LS279, que silencie la alarma temporalmente durante 5 o 10 minutos antes de reactivarla.
+
+\textbf{Ampliación de funcionalidades de visualización:}
+
+\indent El diseño actual está fijo en formato 24 horas y no incluye control automático de brillo ni indicador AM/PM.
+
+\indent Para cambiar este diseño, se podría añadir lógica combinacional adicional para permitir al usuario alternar entre formato 24 h y 12 h, con un LED indicador de AM/PM.  
+
+\indent También se podría incluir una fotorresistencia (LDR) conectada al pin de control de brillo de los decodificadores o a la alimentación de los displays, de manera que el brillo se ajuste automáticamente según la luz ambiental.
+
+\indent Estas mejoras convertirían el prototipo actual en un reloj más preciso, eficiente y fácil de usar, manteniendo al mismo tiempo su valor educativo.
+
+\pagebreak
+
+\textbf{CONCLUSIONES.}
+
+\indent El reloj digital de 24 horas con alarma desarrollado en este proyecto representa una aplicación exitosa y completa de los principios fundamentales de la electrónica digital, mediante la integración de un oscilador NE555 como base de tiempo, contadores 74LS90 en cascada, decodificadores HEF4543/CD4543 y una sección de alarma basada en comparadores 74LS85 y latch SR 74LS279, se logró construir un sistema funcional que mide el tiempo con precisión aceptable y activa una bocina y un LED cuando la hora programada coincide con la hora real. 
+
+\indent La elección del HEF4543 resultó acertada, ya que su pin PHASE permitió adaptar fácilmente las salidas a los displays de ánodo común sin necesidad de modificaciones adicionales en el circuito, demostrando la versatilidad de los componentes CMOS en diseños mixtos con lógica TTL.
+
+\indent A lo largo del desarrollo se aplicaron de manera práctica conceptos clave como el conteo BCD asíncrono, la decodificación a 7 segmentos, la comparación de magnitudes y el uso de memoria elemental mediante latch SR, estas bases teóricas no solo explican el correcto funcionamiento del circuito, sino que también evidencian cómo las señales digitales y la lógica combinacional-secuencial permiten replicar un dispositivo cotidiano como un reloj con alarma.
+
+\indent No obstante, el análisis realizado revela ciertas limitaciones inherentes al enfoque puramente discreto y de lógica TTL/CMOS empleado, tales como la dependencia del NE555 como oscilador que introduce un error acumulado por variaciones térmicas, mientras que la ausencia de respaldo de batería y el alto consumo de los displays encendidos continuamente representan áreas claras de optimización. 
+
+\indent Las propuestas de mejora (como la incorporación de un oscilador de cuarzo, multiplexación de displays, sistema de backup y pulsadores para ajuste rápido de hora y alarma) permitirían elevar el prototipo a un nivel comparable con dispositivos comerciales sin perder su carácter educativo.
+
+\indent En definitiva, este proyecto permitió consolidar conocimientos teóricos de electrónica digital y comprender las ventajas y limitaciones de los circuitos integrados clásicos, obteniendo como resultado que, con componentes accesibles y un diseño bien estructurado, es posible crear sistemas electrónicos útiles y confiables, sentando las bases para futuras implementaciones más avanzadas, ya sea mediante microcontroladores o mejoras en la arquitectura actual.
+
+\end{document}
